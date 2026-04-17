@@ -1,4 +1,9 @@
+![ROS2](https://img.shields.io/badge/ROS2-Jazzy-blue)
+![Navigation](https://img.shields.io/badge/Nav2-MPPI-green)
+![Status](https://img.shields.io/badge/status-active-success)
+
 # Hệ thống robot omni tự hành trong môi trường bệnh viện (ROS2)
+> Hệ thống robot tự hành đa điểm trong môi trường bệnh viện sử dụng ROS2, Nav2 và Genetic Algorithm.
 
 ## Mục lục
 
@@ -120,13 +125,13 @@ Chế độ: - ga: tối ưu lộ trình - sequential: đi theo thứ tự nhậ
 
 ## Thuật toán sử dụng
 
-  Thành phần      Phương pháp
-  --------------- -------------------
-  SLAM            Cartographer
-  Localization    EKF
-  Navigation      Nav2
-  Controller      MPPI
-  Task Planning   Genetic Algorithm
+| Thành phần      | Phương pháp        |
+|----------------|--------------------|
+| SLAM           | Cartographer       |
+| Localization   | EKF                |
+| Navigation     | Nav2               |
+| Controller     | MPPI               |
+| Task Planning  | Genetic Algorithm  |
 
 ------------------------------------------------------------------------
 
