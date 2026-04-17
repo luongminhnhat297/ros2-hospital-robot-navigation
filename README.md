@@ -114,10 +114,6 @@ Cài đặt nhanh:
 
     python3 scripts/gui.py
 
-### Chạy bằng terminal
-
-    python3 scripts/nav_controller.py Phong_1,Phong_5,Phong_10 ga
-
 Chế độ: - ga: tối ưu lộ trình - sequential: đi theo thứ tự nhập
 
 ------------------------------------------------------------------------
@@ -152,8 +148,8 @@ hoặc đề xuất cải tiến - Gửi pull request
 
 ## Tác giả
 
--   Trần Huy Hậu\
--   Lương Minh Nhật\
+-   Trần Huy Hậu
+-   Lương Minh Nhật
 -   Trần Minh Quân
 
 ------------------------------------------------------------------------
@@ -166,4 +162,3 @@ Dự án sử dụng và tham khảo từ các nguồn:
 -   Cartographer
 -   robot_localization
 -   Open Robotics
--   freeCodeCamp -- hướng dẫn viết README
