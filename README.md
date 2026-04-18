@@ -2,168 +2,158 @@
 ![Navigation](https://img.shields.io/badge/Nav2-MPPI-green)
 ![Status](https://img.shields.io/badge/status-active-success)
 
-# Hệ thống robot omni tự hành trong môi trường bệnh viện (ROS2)
-> Hệ thống robot tự hành đa điểm trong môi trường bệnh viện sử dụng ROS2, Nav2 và Genetic Algorithm.
+# Hospital Omni-directional Robot Navigation (ROS2)
 
-## Mục lục
+> An autonomous multi-goal navigation system for hospital environments using ROS2, Nav2, and a Genetic Algorithm.
 
--   [Giới thiệu](#giới-thiệu)
--   [Tính năng](#tính-năng)
--   [Kiến trúc hệ thống](#kiến-trúc-hệ-thống)
--   [Cấu trúc thư mục](#cấu-trúc-thư-mục)
--   [Cài đặt](#cài-đặt)
--   [Hướng dẫn sử dụng](#hướng-dẫn-sử-dụng)
--   [Thuật toán sử dụng](#thuật-toán-sử-dụng)
--   [Định hướng phát triển](#định-hướng-phát-triển)
--   [Đóng góp](#đóng-góp)
--   [Tác giả](#tác-giả)
--   [Credits](#credits)
+---
 
-------------------------------------------------------------------------
+## Overview
 
-## Giới thiệu
+This project implements an autonomous omnidirectional robot capable of navigating hospital-like environments and visiting multiple target locations in an optimized order.
 
-Dự án này xây dựng một hệ thống robot tự hành sử dụng ROS2, có khả năng
-hoạt động trong môi trường bệnh viện và thực hiện nhiệm vụ di chuyển qua
-nhiều phòng theo thứ tự tối ưu.
+Unlike standard navigation problems that focus on a single goal, this system solves a **multi-goal navigation problem**, similar to the Traveling Salesman Problem (TSP), where the objective is to minimize the total travel distance.
 
-Khác với các bài toán điều hướng cơ bản chỉ xử lý một điểm đích, hệ
-thống này giải quyết bài toán phức tạp hơn: lập kế hoạch di chuyển qua
-nhiều điểm (multi-goal navigation). Bài toán này tương tự như bài toán
-người du lịch (TSP), trong đó mục tiêu là tối thiểu hóa tổng quãng đường
-di chuyển.
+The system is designed in a modular way and integrates key components of a real robotic system, including SLAM, localization, navigation, task planning, and a user interface.
 
-Hệ thống được thiết kế theo hướng mô-đun, tích hợp đầy đủ các thành phần
-quan trọng của một hệ thống robot thực tế: SLAM, localization,
-navigation, task planning và giao diện người dùng.
+---
 
-------------------------------------------------------------------------
+## Features
 
-## Tính năng
+- Multi-goal navigation with optimized visiting order
+- Route optimization using a Genetic Algorithm (GA)
+- Uses actual path cost from Nav2 instead of Euclidean distance
+- Re-planning when a goal becomes unreachable
+- Simulation of complex hospital environments (rooms, corridors)
+- Simple GUI for goal selection and monitoring
 
--   Điều hướng qua nhiều điểm với thứ tự tối ưu
--   Tối ưu lộ trình bằng thuật toán di truyền (Genetic Algorithm)
--   Sử dụng chi phí đường đi thực tế từ Nav2 thay vì khoảng cách hình
-    học
--   Tự động tái lập kế hoạch khi gặp vật cản hoặc không thể đến đích
--   Mô phỏng môi trường bệnh viện với nhiều phòng và hành lang phức tạp
--   Giao diện người dùng (GUI) hỗ trợ chọn điểm và giám sát hệ thống
+---
 
-------------------------------------------------------------------------
+## System Architecture
 
-## Kiến trúc hệ thống
+Main components:
 
-Hệ thống bao gồm các thành phần chính:
+- **Gazebo** – simulation environment
+- **Cartographer** – SLAM (map building)
+- **robot_localization (EKF)** – sensor fusion
+- **Nav2** – path planning and control
+- **Genetic Algorithm** – goal ordering optimization
+- **Navigation Controller** – execution and re-planning logic
+- **GUI (PyQt5)** – user interaction
 
--   Gazebo: môi trường mô phỏng
--   Cartographer: xây dựng bản đồ (SLAM)
--   robot_localization (EKF): hợp nhất dữ liệu cảm biến
--   Nav2: lập kế hoạch đường đi và điều khiển robot
--   Genetic Algorithm: tối ưu thứ tự các điểm cần đi
--   Nav Controller: điều phối thực thi và xử lý re-planning
--   GUI (PyQt5): giao diện người dùng
+### Workflow
 
-Luồng hoạt động:
+1. User selects target locations
+2. Genetic Algorithm computes optimal order
+3. Nav2 generates detailed paths
+4. Robot executes navigation
+5. If failure occurs → system re-plans
 
-1.  Người dùng chọn các phòng cần đi
-2.  Thuật toán GA tính toán thứ tự tối ưu
-3.  Nav2 lập đường đi chi tiết
-4.  Robot thực hiện di chuyển
-5.  Nếu xảy ra lỗi → hệ thống tính toán lại lộ trình
+---
 
-------------------------------------------------------------------------
+## Project Structure
 
-## Cấu trúc thư mục
+```bash
+robot_omni/
+├── launch/
+├── config/
+├── urdf/
+├── worlds/
+├── map/
+├── rviz/
+├── models/
+├── scripts/
+├── gui/
+└── CMakeLists.txt
+```
 
-    robot_omni/
-    ├── launch/
-    ├── config/
-    ├── urdf/
-    ├── worlds/
-    ├── map/
-    ├── rviz/
-    ├── models/
-    ├── scripts/
-    └── CMakeLists.txt
+---
 
-------------------------------------------------------------------------
+## Installation
 
-## Cài đặt
+### Requirements
 
-### Yêu cầu
+- ROS2 (Jazzy recommended)
+- Nav2
+- Cartographer
+- robot_localization
+- Gazebo (ros_gz)
+- Python3 + PyQt5
 
--   ROS2 (khuyến nghị Jazzy)
--   Nav2
--   Cartographer
--   robot_localization
--   Gazebo (ros_gz)
--   Python3 + PyQt5
+### Install dependencies
 
-Cài đặt nhanh:
+```bash
+sudo apt update
+sudo apt install ros-jazzy-navigation2 \
+                 ros-jazzy-nav2-bringup \
+                 ros-jazzy-cartographer \
+                 ros-jazzy-robot-localization \
+                 python3-pyqt5
+```
 
-    sudo apt update
-    sudo apt install ros-jazzy-nav2* \
-                     ros-jazzy-cartographer* \
-                     ros-jazzy-robot-localization \
-                     python3-pyqt5
+---
 
-------------------------------------------------------------------------
+## Usage
 
-## Hướng dẫn sử dụng
+### Launch the system
 
-### Chạy hệ thống
+```bash
+ros2 launch robot_omni navigation2_old.launch.py
+```
 
-    ros2 launch robot_omni navigation2_old.launch.py
+### Run GUI
 
-### Chạy giao diện
+```bash
+python3 gui/gui.py
+```
 
-    python3 scripts/gui.py
+### Modes
 
-Chế độ: - ga: tối ưu lộ trình - sequential: đi theo thứ tự nhập
+- `ga`: optimized route using Genetic Algorithm
+- `sequential`: follow input order
 
-------------------------------------------------------------------------
+---
 
-## Thuật toán sử dụng
+## Algorithms
 
-| Thành phần      | Phương pháp        |
-|----------------|--------------------|
-| SLAM           | Cartographer       |
-| Localization   | EKF                |
-| Navigation     | Nav2               |
-| Controller     | MPPI               |
-| Task Planning  | Genetic Algorithm  |
+| Component        | Method              |
+|------------------|---------------------|
+| SLAM             | Cartographer        |
+| Localization     | EKF                 |
+| Navigation       | Nav2                |
+| Controller       | MPPI                |
+| Task Planning    | Genetic Algorithm   |
 
-------------------------------------------------------------------------
+---
 
-## Định hướng phát triển
+## Future Work
 
--   Hỗ trợ nhiều robot (multi-robot)
--   Tích hợp hệ thống quản lý nhiệm vụ
--   Triển khai trên robot thực
--   Cải thiện xử lý vật cản động
+- Multi-robot support
+- Task management system integration
+- Deployment on real hardware
+- Improved dynamic obstacle handling
 
-------------------------------------------------------------------------
+---
 
-## Đóng góp
+## Contributing
 
-Mọi đóng góp đều được hoan nghênh. Bạn có thể: - Tạo issue để báo lỗi
-hoặc đề xuất cải tiến - Gửi pull request
+If you find a bug or have suggestions, feel free to open an issue.
 
-------------------------------------------------------------------------
+Pull requests are welcome.
 
-## Tác giả
+---
 
--   Trần Huy Hậu
--   Lương Minh Nhật
--   Trần Minh Quân
+## Authors
 
-------------------------------------------------------------------------
+- Tran Huy Hau
+- Luong Minh Nhat
+- Tran Minh Quan
+
+---
 
 ## Credits
 
-Dự án sử dụng và tham khảo từ các nguồn:
+- ROS2 Navigation (Nav2)
+- Cartographer
+- robot_localization
 
--   ROS2 Navigation (Nav2)
--   Cartographer
--   robot_localization
--   Open Robotics
