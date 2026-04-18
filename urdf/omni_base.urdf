@@ -70,8 +70,8 @@
     </hardware>
     <joint name="wheel_front_right_joint">
       <command_interface name="velocity">
-        <param name="min">-1</param>
-        <param name="max">1</param>
+        <param name="min">-100</param>
+        <param name="max">100</param>
       </command_interface>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
@@ -85,8 +85,8 @@
     </transmission>
     <joint name="wheel_front_left_joint">
       <command_interface name="velocity">
-        <param name="min">-1</param>
-        <param name="max">1</param>
+        <param name="min">-100</param>
+        <param name="max">100</param>
       </command_interface>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
@@ -100,8 +100,8 @@
     </transmission>
     <joint name="wheel_rear_right_joint">
       <command_interface name="velocity">
-        <param name="min">-1</param>
-        <param name="max">1</param>
+        <param name="min">-100</param>
+        <param name="max">100</param>
       </command_interface>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
@@ -115,8 +115,8 @@
     </transmission>
     <joint name="wheel_rear_left_joint">
       <command_interface name="velocity">
-        <param name="min">-1</param>
-        <param name="max">1</param>
+        <param name="min">-100</param>
+        <param name="max">100</param>
       </command_interface>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
@@ -284,7 +284,7 @@
   <link name="base_link">
     <inertial>
       <origin rpy="0 0 0" xyz="0.0026742 0.00027459 0.086363"/>
-      <mass value="34.047"/>
+      <mass value="5.0"/>
       <inertia ixx="0.22777" ixy="0.00035979" ixz="0.00015269" iyy="0.29991" iyz="1.7872E-05" izz="0.46036"/>
     </inertial>
     <visual>
@@ -469,7 +469,7 @@
     <parent link="suspension_front_right_link"/>
     <child link="wheel_front_right_link"/>
     <axis xyz="0 0 1"/>
-    <limit effort="6.0" velocity="13.123359580052492"/>
+    <limit effort="50.0" velocity="100"/>
     <dynamics damping="1.0" friction="2.0"/>
   </joint>
   <!-- Contact model for the wheel surface -->
@@ -477,10 +477,10 @@
     <kp>1000000.0</kp>
     <kd>1000.0</kd>
     <mu1>1.0</mu1>
-    <mu2>0.1</mu2>
+    <mu2>0.8</mu2>
     <fdir1>1 0 0</fdir1>
-    <maxVel>1.0</maxVel>
-    <minDepth>0.00</minDepth>
+    <maxVel>100.0</maxVel>
+    <minDepth>0.005</minDepth>
     <implicitSpringDamper>1</implicitSpringDamper>
     <material>Gazebo/Grey</material>
   </gazebo>
@@ -540,7 +540,7 @@
     <parent link="suspension_front_left_link"/>
     <child link="wheel_front_left_link"/>
     <axis xyz="0 0 1"/>
-    <limit effort="6.0" velocity="13.123359580052492"/>
+    <limit effort="50.0" velocity="100"/>
     <dynamics damping="1.0" friction="2.0"/>
   </joint>
   <!-- Contact model for the wheel surface -->
@@ -548,9 +548,9 @@
     <kp>1000000.0</kp>
     <kd>1000.0</kd>
     <mu1>1.0</mu1>
-    <mu2>0.1</mu2>
+    <mu2>0.8</mu2>
     <fdir1>1 0 0</fdir1>
-    <maxVel>1.0</maxVel>
+    <maxVel>100.0</maxVel>
     <minDepth>0.00</minDepth>
     <implicitSpringDamper>1</implicitSpringDamper>
     <material>Gazebo/Grey</material>
@@ -611,7 +611,7 @@
     <parent link="suspension_rear_right_link"/>
     <child link="wheel_rear_right_link"/>
     <axis xyz="0 0 1"/>
-    <limit effort="6.0" velocity="13.123359580052492"/>
+    <limit effort="50.0" velocity="100"/>
     <dynamics damping="1.0" friction="2.0"/>
   </joint>
   <!-- Contact model for the wheel surface -->
@@ -619,10 +619,10 @@
     <kp>1000000.0</kp>
     <kd>1000.0</kd>
     <mu1>1.0</mu1>
-    <mu2>0.1</mu2>
+    <mu2>0.8</mu2>
     <fdir1>1 0 0</fdir1>
-    <maxVel>1.0</maxVel>
-    <minDepth>0.00</minDepth>
+    <maxVel>100.0</maxVel>
+    <minDepth>0.005</minDepth>
     <implicitSpringDamper>1</implicitSpringDamper>
     <material>Gazebo/Grey</material>
   </gazebo>
@@ -682,7 +682,7 @@
     <parent link="suspension_rear_left_link"/>
     <child link="wheel_rear_left_link"/>
     <axis xyz="0 0 1"/>
-    <limit effort="6.0" velocity="13.123359580052492"/>
+    <limit effort="50.0" velocity="100"/>
     <dynamics damping="1.0" friction="2.0"/>
   </joint>
   <!-- Contact model for the wheel surface -->
@@ -690,10 +690,10 @@
     <kp>1000000.0</kp>
     <kd>1000.0</kd>
     <mu1>1.0</mu1>
-    <mu2>0.1</mu2>
+    <mu2>0.8</mu2>
     <fdir1>1 0 0</fdir1>
-    <maxVel>1.0</maxVel>
-    <minDepth>0.00</minDepth>
+    <maxVel>100.0</maxVel>
+    <minDepth>0.005</minDepth>
     <implicitSpringDamper>1</implicitSpringDamper>
     <material>Gazebo/Grey</material>
   </gazebo>

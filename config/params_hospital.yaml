@@ -15,7 +15,7 @@ amcl:
     always_reset_initial_pose: false
     first_map_only: false
     initial_pose:
-      x: 0.1
+      x: 0.0
       y: 0.0
       z: 0.0
       yaw: 0.0
@@ -28,28 +28,28 @@ amcl:
     min_particles: 500
     pf_err: 0.05
     pf_z: 0.99
-    update_min_a: 0.05
-    update_min_d: 0.05
+    update_min_a: 0.1
+    update_min_d: 0.1
     resample_interval: 1
-    transform_tolerance: 0.2
+    transform_tolerance: 2.0
     
     # Các hệ số nhiễu (Alpha)
-    alpha1: 0.15
-    alpha2: 0.15
-    alpha3: 0.10
-    alpha4: 0.10
-    alpha5: 0.15
+    alpha1: 0.5
+    alpha2: 0.5
+    alpha3: 0.5
+    alpha4: 0.5
+    alpha5: 0.5
     
     # Thông số Laser
     laser_max_range: 100.0
     laser_min_range: -1.0
     laser_model_type: "likelihood_field"
     max_beams: 60
-    z_hit: 0.5
+    z_hit: 0.8
     z_max: 0.05
-    z_rand: 0.5
+    z_rand: 0.1 
     z_short: 0.05
-    sigma_hit: 0.2
+    sigma_hit: 0.1
     lambda_short: 0.1
     beam_skip_distance: 0.5
     beam_skip_error_threshold: 0.9
@@ -100,157 +100,81 @@ global_costmap:
       use_sim_time: true
       global_frame: map
       robot_base_frame: base_link
-      # transform_tolerance: 1.0      # 🔥 THÊM DÒNG NÀY VÀO ĐÂY
       
       # 🔥 THÊM DÒNG NÀY (Khai báo 4 góc xe, giả sử xe 50x50cm)
-      # footprint: "[ [0.32, 0.21], [0.32, -0.21], [-0.32, -0.21], [-0.32, 0.21] ]"
-      footprint: "[[0.3, 0.25], [0.3, -0.25], [-0.3, -0.25], [-0.3, 0.25]]"
+      footprint: "[ [0.36, 0.25], [0.36, -0.25], [-0.36, -0.25], [-0.36, 0.25] ]"
       
       rolling_window: false
-      width: 8
-      height: 8
+      width: 10
+      height: 10
       resolution: 0.05
 
-      plugins: ["static_layer", "voxel_layer", "inflation_layer"]
+      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
 
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
         map_subscribe_transient_local: True
-
-      # 2. Thay thế toàn bộ khối voxel_layer cũ bằng khối này
-      voxel_layer:
-        plugin: "nav2_costmap_2d::VoxelLayer"
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
         enabled: True
-        footprint_clearing_enabled: true
-        max_obstacle_height: 2.0
-        publish_voxel_map: True
-        origin_z: 0.0
-        z_resolution: 0.1
-        z_voxels: 15
-        mark_threshold: 0
-        observation_sources: pointcloud scan scan1
-        combination_method: 1
-        
+        observation_sources: scan 
         scan:
           topic: /scan_front_raw
           max_obstacle_height: 2.0
-          min_obstacle_height: 0.5
-          inf_is_valid: true
-          raytrace_max_range: 26.0
-          # 🔥 TĂNG LÊN 25.0: Thấy từ xa là nhớ luôn, không bị xóa khi lùi lại
-          obstacle_max_range: 25.0 
           clearing: True
           marking: True
           data_type: "LaserScan"
-          
-        scan1:
-          topic: /scan_rear_raw
-          max_obstacle_height: 2.0
-          min_obstacle_height: 0.5
-          inf_is_valid: true
-          raytrace_max_range: 26.0
-          # 🔥 TĂNG LÊN 25.0
-          obstacle_max_range: 25.0 
-          clearing: True
-          marking: True
-          data_type: "LaserScan"
-          
-        pointcloud:  # no frame set, uses frame from message
-          topic: /camera/points
-          max_obstacle_height: 2.0
-          min_obstacle_height: 0.5
-          obstacle_max_range: 8.0
-          obstacle_min_range: 0.0
-          raytrace_max_range: 9.0
-          raytrace_min_range: 0.0
-          clearing: True
-          marking: True
-          data_type: "PointCloud2"
-          # transport_type: "raw"  # raw or/ with compression (zlib, draco, zstd)
+
+
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        inflation_radius: 0.7
+        # 🔥 TĂNG TỪ 0.55 LÊN 1.2 (Sương mù tỏa ra tít ngoài xa)
+        inflation_radius: 1.2
+        # 🔥 GIẢM MẠNH TỪ 25.0 XUỐNG 3.0 (Ép A* tìm chỗ nào chi phí thấp nhất -> chính giữa hành lang)
         cost_scaling_factor: 3.0
 
 local_costmap:
   local_costmap:
     ros__parameters:
       use_sim_time: true
-      global_frame: map
+      global_frame: odom
       robot_base_frame: base_link
-      update_frequency: 20.0         # Tần số tính toán xóa/ghi vật cản (10 lần/giây)
-      publish_frequency: 30.0        # Tần số gửi hình ảnh lên RViz (10 lần/giây)
-      transform_tolerance: 0.2      # 🔥 THÊM DÒNG NÀY VÀO ĐÂY
       
       # 🔥 THÊM DÒNG NÀY NỮA
-      # footprint: "[ [0.32, 0.21], [0.32, -0.21], [-0.32, -0.21], [-0.32, 0.21] ]"
-      footprint: "[[0.3, 0.25], [0.3, -0.25], [-0.3, -0.25], [-0.3, 0.25]]"
+      footprint: "[ [0.36, 0.25], [0.36, -0.25], [-0.36, -0.25], [-0.36, 0.25] ]"
       
       resolution: 0.05
 
       # IMPORTANT for local behavior
       rolling_window: true
-      width: 25
-      height: 25
+      width: 3
+      height: 3
 
       plugins: ["obstacle_layer", "inflation_layer"] # Thêm obstacle_layer
 
-      # 2. Thay thế toàn bộ khối voxel_layer cũ bằng khối này
       obstacle_layer:
-        plugin: "nav2_costmap_2d::ObstacleLayer"  # Dùng 2D layer thay vì 3D
+        plugin: "nav2_costmap_2d::ObstacleLayer"
         enabled: True
-        footprint_clearing_enabled: true
-        observation_sources: pointcloud scan scan1
-        combination_method: 1
-        
+        observation_sources: scan
         scan:
           topic: /scan_front_raw
           max_obstacle_height: 2.0
-          min_obstacle_height: 0.5
-          inf_is_valid: true
-          raytrace_max_range: 26.0     # BẮT BUỘC > 25.0 (Max range trong URDF)
-          obstacle_max_range: 4.5
           clearing: True
           marking: True
           data_type: "LaserScan"
-          
-        scan1:
-          topic: /scan_rear_raw
-          max_obstacle_height: 2.0
-          min_obstacle_height: 0.5
-          inf_is_valid: true
-          raytrace_max_range: 26.0     # BẮT BUỘC > 25.0
-          obstacle_max_range: 4.5
-          clearing: True
-          marking: True
-          data_type: "LaserScan"
-          
-        pointcloud:  # no frame set, uses frame from message
-          topic: /camera/points
-          max_obstacle_height: 2.0
-          min_obstacle_height: 0.5
-          obstacle_max_range: 8.0
-          obstacle_min_range: 0.0
-          raytrace_max_range: 9.0
-          raytrace_min_range: 0.0
-          clearing: True
-          marking: True
-          data_type: "PointCloud2"
-          # transport_type: "raw"  # raw or/ with compression (zlib, draco, zstd)
 
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         # 🔥 Giữ nguyên để xe tự tin chui qua khe hẹp
-        inflation_radius: 0.7
-        cost_scaling_factor: 4.0
+        inflation_radius: 0.4
+        cost_scaling_factor: 20.0
         
 
 planner_server:
   ros__parameters:
     use_sim_time: true
-    expected_planner_frequency: 20.0
-    # footprint: "[ [0.32, 0.21], [0.32, -0.21], [-0.32, -0.21], [-0.32, 0.21] ]"
-    footprint: "[[0.3, 0.25], [0.3, -0.25], [-0.3, -0.25], [-0.3, 0.25]]"
+    expected_planner_frequency: 10.0
+    footprint: "[ [0.36, 0.25], [0.36, -0.25], [-0.36, -0.25], [-0.36, 0.25] ]"
     # robot_radius: 0.36
     planner_plugins: ["GridBased"]
 
@@ -263,7 +187,7 @@ planner_server:
       # 🔥 2. VŨ KHÍ ÉP ĐI ĐƯỜNG THẲNG
       # Mặc định là 2.0. Tăng lên 5.0 để bộ não hiểu rằng: 
       # "Thà đi thẳng xa hơn một chút, còn hơn là đi chéo vào vùng sương mù gần tường!"
-      cost_travel_multiplier: 15.0
+      cost_travel_multiplier: 5.0   
       
       # 🔥 3. CHUẨN BỊ TƯ THẾ
       # Ép xe tính toán góc thẳng đứng khi chuẩn bị vào cửa
@@ -273,7 +197,6 @@ controller_server:
   ros__parameters:
     use_sim_time: true
     controller_frequency: 20.0
-    transform_tolerance: 0.2       # 🔥 THÊM DÒNG NÀY: Cho phép sai số thời gian TF trễ 1.0 giây
     costmap_update_timeout: 0.3
     min_x_velocity_threshold: 0.001
     min_y_velocity_threshold: 0.001
@@ -284,13 +207,13 @@ controller_server:
     enable_stamped_cmd_vel: True
     progress_checker_plugins: ["progress_checker"] 
     goal_checker_plugins: ["goal_checker"] 
-    path_handler_plugins: ["PathHandler"] # Đã sửa lỗi chính tả plguins -> plugins
+    path_handler_plguins: ["PathHandler"]
     controller_plugins: ["FollowPath"]
     
     progress_checker:
       plugin: "nav2_controller::SimpleProgressChecker"
-      required_movement_radius: 0.1
-      movement_time_allowance: 5.0
+      required_movement_radius: 0.5
+      movement_time_allowance: 2.5
       
     goal_checker:
       plugin: "nav2_controller::SimpleGoalChecker"
@@ -308,124 +231,97 @@ controller_server:
       inversion_yaw_tolerance: 0.4
       minimum_rotation_angle: 0.785
       reject_unit_path: False  
-
-    FollowPath: 
-      plugin: "nav2_rotation_shim_controller::RotationShimController"
-
-      # ===== Rotation Shim =====
-      angular_dist_threshold: 0.6981        # ~45 deg
-      angular_disengage_threshold: 0.0873  # ~22 deg
-      forward_sampling_distance: 0.5
-
-      rotate_to_heading_angular_vel: 1.5
-      max_angular_accel: 1.0
-      simulate_ahead_time: 1.0
-      rotate_to_goal_heading: false
-
-      # ===== MPPI (GIỮ NGUYÊN 100%) =====
-      primary_controller: "nav2_mppi_controller::MPPIController"
-
-      time_steps: 10
-      model_dt: 0.1
-      batch_size: 600
       
-      vx_std: 0.8
-      vy_std: 0.0 
-      wz_std: 0.6
+    # ==========================================
+    # CẤU HÌNH DWB PLANNER - ÉP CHẠY DIFF-DRIVE
+    # ==========================================
+    FollowPath:
+      plugin: "dwb_core::DWBLocalPlanner"
+      debug_trajectory_details: true
       
-      vx_max: 2.0
-      vx_min: -0.5
-      vy_max: 0.0
-      wz_max: 2.0
+      # 🔥 1. GIỚI HẠN VẬN TỐC (KHÓA CHẶT TRỤC Y)
+      min_vel_x: -0.4          # Để 0.0 nếu cấm đi lùi, hoặc -0.7 nếu cho phép đi lùi
+      min_vel_y: 0.0           # [KHÓA] Không trượt ngang
+      max_vel_x: 0.4       # Vận tốc tiến tới (m/s)
+      max_vel_y: 0.0           # [KHÓA] Không trượt ngang
+      max_vel_theta: 2.0       # Vận tốc xoay (rad/s)
       
-      ax_max: 1.5
-      ax_min: -1.5
-      ay_max: 0.0
-      ay_min: 0.0
-      az_max: 1.0
+      min_speed_xy: -0.4
+      max_speed_xy: 0.4
+      min_speed_theta: 0.0
       
-      iteration_count: 1
-      temperature: 0.3
-      gamma: 0.015
-      motion_model: "DiffDrive"
-      visualize: false
-      critic_index_to_visualize: 0
-      regenerate_noises: false
-      
-      TrajectoryVisualizer:
-        trajectory_step: 5
-        time_step: 3
-        
-      TrajectoryValidator:
-        plugin: "mppi::DefaultOptimalTrajectoryValidator"
-        collision_lookahead_time: 3.0
-        consider_footprint: true
-          
-      AckermannConstraints:
-        min_turning_r: 0.0
-        
-      critics: ["ConstraintCritic", "CostCritic", "GoalCritic", "GoalAngleCritic", "PathAlignCritic", "PathFollowCritic", "PathAngleCritic", "PreferForwardCritic"]
-      
-      ConstraintCritic:
-        enabled: true
-        cost_power: 1
-        cost_weight: 4.0
-        
-      CostCritic:
-        enabled: true
-        cost_power: 1
-        cost_weight: 8.0
-        critical_cost: 300.0
-        consider_footprint: true
-        collision_cost: 1000000.0
-        near_goal_distance: 1.0
-        trajectory_point_step: 2
-        
-      GoalCritic:
-        enabled: true
-        cost_power: 1
-        cost_weight: 7.0
-        threshold_to_consider: 1.4
-        
-      GoalAngleCritic:
-        enabled: true
-        cost_power: 1
-        cost_weight: 2.0
-        threshold_to_consider: 0.5
-        
-      PreferForwardCritic:
-        enabled: true
-        cost_power: 1
-        cost_weight: 10.0
-        threshold_to_consider: 0.5
-        
-      PathAlignCritic:
-        enabled: true
-        cost_power: 1
-        cost_weight: 8.0
-        max_path_occupancy_ratio: 0.05
-        trajectory_point_step: 4
-        threshold_to_consider: 0.5
-        offset_from_furthest: 20
-        use_path_orientations: false
-        
-      PathFollowCritic:
-        enabled: true
-        cost_power: 1
-        cost_weight: 8.0
-        offset_from_furthest: 5
-        threshold_to_consider: 1.4
-        
-      PathAngleCritic:
-        enabled: true
-        cost_power: 1
-        cost_weight: 4.0
-        offset_from_furthest: 4
-        threshold_to_consider: 0.5
-        max_angle_to_furthest: 1.0
-        mode: 0
+      # 🔥 2. GIỚI HẠN GIA TỐC (KHÓA CHẶT TRỤC Y)
+      acc_lim_x: 1.0
+      acc_lim_y: 0.0           # [KHÓA] Không gia tốc ngang
+      acc_lim_theta: 2.0
+      decel_lim_x: -2.5
+      decel_lim_y: 0.0         # [KHÓA]
+      decel_lim_theta: -2.0
 
+      # 🔥 3. BỘ LẤY MẪU QUỸ ĐẠO (TẮT LẤY MẪU Y)
+      vx_samples: 20
+      vy_samples: 0            # [KHÓA] Báo cho DWB biết không cần tính toán đường chéo/ngang
+      vtheta_samples: 50
+      sim_time: 3.0          # Thời gian phóng quỹ đạo ảo về phía trước (s)
+      linear_granularity: 0.05
+      angular_granularity: 0.025
+      
+      transform_tolerance: 0.2
+      xy_goal_tolerance: 0.25
+      trans_stopped_velocity: 0.25
+      short_circuit_trajectory_evaluation: true
+      stateful: true
 
+      # 🔥 4. CÁC TIÊU CHÍ CHẤM ĐIỂM QUỸ ĐẠO (CRITICS)
+      critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
+      BaseObstacle.scale: 0.1
+      PathAlign.scale: 32.0
+      PathAlign.forward_point_distance: 0.35
+      GoalAlign.scale: 10.0
+      GoalAlign.forward_point_distance: 0.35
+      PathDist.scale: 80.0
+      GoalDist.scale: 24.0
+      RotateToGoal.scale: 64.0
+      RotateToGoal.slowing_factor: 5.0
+      RotateToGoal.lookahead_time: -1.0
+    # FollowPath:
+    #   plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
+      
+    #   # 1. TỐC ĐỘ CƠ BẢN
+    #   desired_linear_vel: 0.7
+    #   lookahead_dist: 0.4
+    #   min_lookahead_dist: 0.2
+    #   max_lookahead_dist: 0.6
+    #   lookahead_time: 1.5
+    #   transform_tolerance: 0.1
+      
+    #   # 🔥 2. VŨ KHÍ BÍ MẬT: ĐẢO CHIỀU XE THÔNG MINH
+    #   allow_reversing: true  
+    #   # Khi bật TRUE: Nếu điểm "củ cà rốt" nằm ở phía sau lưng xe (góc > 90 độ), 
+    #   # xe sẽ tự động coi cái đuôi là cái mũi, và xuất lệnh vận tốc âm (đi lùi) bám theo đường path.
+      
+    #   # 3. KẾT HỢP VỚI XOAY TẠI CHỖ (Cho các góc hẹp)
+    #   use_rotate_to_heading: true 
+    #   rotate_to_heading_min_angle: 0.785   # ~45 độ.
+    #   rotate_to_heading_angular_vel: 1.5   # Vận tốc xoay
+    #   max_angular_accel: 1.5               # Gia tốc xoay
+    #   # Giải thích logic kết hợp: 
+    #   # - Lệch 0 -> 45 độ: Xe vừa tiến vừa bẻ lái.
+    #   # - Lệch 45 -> 90 độ: Xe đứng lại xoay đầu cho thẳng rồi mới tiến.
+    #   # - Lệch > 90 độ: Xe tự động gài số lùi (không cần xoay).
+
+    #   # 4. HỆ THỐNG PHANH MỀM (Giữ nguyên các tính năng an toàn)
+    #   use_velocity_scaled_lookahead_dist: false
+    #   min_approach_linear_velocity: 0.05
+    #   approach_velocity_scaling_dist: 0.4
+      
+    #   use_collision_detection: true
+    #   max_allowed_time_to_collision_up_to_carrot: 1.0
+      
+    #   use_regulated_linear_velocity_scaling: true
+    #   use_cost_regulated_linear_velocity_scaling: true
+    #   regulated_linear_scaling_min_radius: 0.9
+    #   regulated_linear_scaling_min_speed: 0.25
 smoother_server:
   ros__parameters:
     costmap_topic: global_costmap/costmap_raw
@@ -437,7 +333,7 @@ smoother_server:
       plugin: "nav2_smoother::SimpleSmoother"
       tolerance: 1.0e-10
       do_refinement: True
-      refinement_num: 4
+      refinement_num: 2
       max_its: 1000
       w_data: 0.2
       w_smooth: 0.3
@@ -447,17 +343,16 @@ velocity_smoother:
   ros__parameters:
     use_sim_time: true
     smoothing_frequency: 20.0
-    scale_velocities: true
+    scale_velocities: false
     feedback: "OPEN_LOOP"
     # MẢNG LÀ [X, Y, THETA]. ĐÃ MỞ KHÓA Y:
-    max_velocity: [2.0, 0.0, 2.0]     
-    min_velocity: [-0.5, 0.0, -2.0]
+    max_velocity: [1.0, 0.0, 2.0]     
+    min_velocity: [-1.0, 0.0, -2.0]
     deadband_velocity: [0.0, 0.0, 0.0]
     velocity_timeout: 1.0
-    max_accel: [1.5, 0.0, 1.5]        
-    max_decel: [-1.5, 0.0, -1.5]
+    max_accel: [1.0, 0.0, 2.5]        
+    max_decel: [-2.5, 0.0, -2.5]
     odom_topic: "/odometry/filtered"
-    cmd_vel_topic: "cmd_vel_smoothed"
     odom_duration: 0.1
     use_realtime_priority: false
     enable_stamped_cmd_vel: true
@@ -465,7 +360,7 @@ velocity_smoother:
 
 collision_monitor:
   ros__parameters:
-    enabled: true
+    enabled: True
     use_sim_time: true
     base_frame_id: "base_link"
     odom_frame_id: "odom"
@@ -478,35 +373,35 @@ collision_monitor:
     stop_pub_timeout: 2.0
     enable_stamped_cmd_vel: True  # False for Jazzy or older
     use_realtime_priority: false
-    polygons: ["PolygonStop", "PolygonSlow", "FootprintApproach","PolygonLimit"]
+    polygons: ["PolygonStop", "PolygonSlow", "FootprintApproach"]
     PolygonStop:
-      type: "polygon"
-      points: "[[1.5, 0.40], [1.5, -0.40], [-0.5, -0.40], [-0.5, 0.40]]"
+      type: "circle"
+      radius: 0.22
       action_type: "stop"
       min_points: 4  # max_points: 3 for Humble
       visualize: True
       polygon_pub_topic: "polygon_stop"
-      enabled: false
+      enabled: True
     PolygonSlow:
       type: "polygon"
       # 🔥 BÓP CHIỀU RỘNG TỪ 1.0 XUỐNG 0.35 (Tổng rộng 70cm, vừa đủ bao bọc nhẹ ngoài thân xe)
-      points: "[[2.25, 0.5], [2.25 , -0.5], [-2.25, -0.5], [-2.25, 0.5]]"
+      points: "[[1.0, 0.35], [1.0, -0.35], [-0.5, -0.35], [-0.5, 0.35]]"
       action_type: "slowdown"
       min_points: 4  
-      slowdown_ratio: 0.3
+      slowdown_ratio: 0.7
       visualize: True
       polygon_pub_topic: "polygon_slowdown"
-      enabled:  True
+      enabled: True
     PolygonLimit:
       type: "polygon"
-      points: "[[2.25, 1.1], [2.25, -1.1], [-2.25, -1.1], [-2.25, 1.1 ]]"
+      points: "[[0.5, 0.5], [0.5, -0.5], [-0.5, -0.5], [-0.5, 0.5]]"
       action_type: "limit"
-      min_points: 4 
-      linear_limit: 1.0
-      angular_limit: 2.0
-      visualize: false
+      min_points: 4  # max_points: 3 for Humble
+      linear_limit: 0.4
+      angular_limit: 0.5
+      visualize: True
       polygon_pub_topic: "polygon_limit"
-      enabled: false
+      enabled: True
     FootprintApproach:
       type: "polygon"
       action_type: "approach"
@@ -515,13 +410,13 @@ collision_monitor:
       simulation_time_step: 0.02
       min_points: 6  # max_points: 5 for Humble
       visualize: False
-      enabled: false
+      enabled: True
     VelocityPolygonStop:
       type: "velocity_polygon"
       action_type: "stop"
       min_points: 6
       visualize: True
-      enabled: false
+      enabled: True
       polygon_pub_topic: "velocity_polygon_stop"
       velocity_polygons: ["rotation", "translation_forward", "translation_backward", "stopped"]
       holonomic: false
@@ -532,13 +427,13 @@ collision_monitor:
         theta_min: -1.0
         theta_max: 1.0
       translation_forward:
-        points: "[[0.50, 0.30], [0.50, -0.30], [-0.36, -0.30], [-0.36, 0.30]]"
+        points: "[[0.35, 0.25], [0.35, -0.25], [-0.2, -0.25], [-0.2, 0.25]]"
         linear_min: 0.0
-        linear_max: 5.0
+        linear_max: 1.0
         theta_min: -1.0
         theta_max: 1.0
       translation_backward:
-        points: "[[0.36, 0.30], [0.36, -0.30], [-0.50, -0.30], [-0.50, 0.30]]"
+        points: "[[0.2, 0.3], [0.2, -0.3], [-0.35, -0.3], [-0.35, 0.3]]"
         linear_min: -1.0
         linear_max: 0.0
         theta_min: -1.0
@@ -547,17 +442,17 @@ collision_monitor:
       # It is used as the stopped polygon when the robot is not moving and as a fallback if the velocity
       # is not covered by any of the other sub-polygons
       stopped:
-        points: "[[0.41, 0.30], [0.41, -0.30], [-0.41, -0.30], [-0.41, 0.30]]"
+        points: "[[0.25, 0.25], [0.25, -0.25], [-0.25, -0.25], [-0.25, 0.25]]"
         linear_min: -1.0
         linear_max: 1.0
         theta_min: -1.0
         theta_max: 1.0
     observation_sources: ["scan", "pointcloud"]
     scan:
-      source_timeout: 0.5
+      source_timeout: 0.2
       type: "scan"
       topic: "/scan_front_raw"
-      enabled: false
+      enabled: True
     pointcloud:
       type: "pointcloud"
       topic: "/intel_realsense_r200_depth/points"
@@ -612,10 +507,9 @@ behavior_server:
     # 🔥 TĂNG ĐỒNG BỘ VỚI DWB VÀ SMOOTHER HÔM TRƯỚC
     max_rotational_vel: 2.0     # Tăng từ 1.0 lên 2.0
     min_rotational_vel: 0.4
-    rotational_acc_lim: 0.5     # Tăng từ 3.2 lên 5.0 để xe xoay đầu chớp nhoáng
+    rotational_acc_lim: 1.5     # Tăng từ 3.2 lên 5.0 để xe xoay đầu chớp nhoáng
     
     enable_stamped_cmd_vel: true
-
 lifecycle_manager_localization:
   ros__parameters:
     use_sim_time: true
@@ -626,4 +520,4 @@ lifecycle_manager_navigation:
   ros__parameters:
     use_sim_time: true
     autostart: true
-    node_names: ['planner_server', 'controller_server', 'smoother_server', 'behavior_server', 'bt_navigator', 'collision_monitor']
+    node_names: ['planner_server', 'controller_server', 'smoother_server', 'behavior_server', 'bt_navigator']

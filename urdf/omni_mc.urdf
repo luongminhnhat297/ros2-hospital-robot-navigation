@@ -843,7 +843,7 @@
                   </image>
                   <clip>
                       <near>0.02</near>
-                      <far>10.0</far>
+                      <far>25.0</far>
                   </clip>
               </camera>
           </sensor>

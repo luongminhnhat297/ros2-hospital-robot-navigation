@@ -37,29 +37,29 @@ mobile_base_controller:
     base_frame_id: base_link
     odom_frame_id: odom
     enable_odom_tf: false 
-    # linear:
-    #   x:
-    #     has_velocity_limits    : true
-    #     max_velocity           : 1.0     
-    #     min_velocity           : -1.0
-    #     has_acceleration_limits: true
-    #     max_acceleration       : 2.0     
-    #     min_acceleration       : -2.0
-    #   y:
-    #     has_velocity_limits    : true
-    #     max_velocity           : 0.0     
-    #     min_velocity           : -0.0
-    #     has_acceleration_limits: true
-    #     max_acceleration       : 0.0     
-    #     min_acceleration       : -0.0
-    # angular:
-    #   z:
-    #     has_velocity_limits    : true
-    #     max_velocity           : 1.5     
-    #     min_velocity           : -1.5
-    #     has_acceleration_limits: true
-    #     max_acceleration       : 2.0
-    #     min_acceleration       : -2.0
+    linear:
+      x:
+        has_velocity_limits    : true
+        max_velocity           : 1.2   
+        min_velocity           : -1.0
+        has_acceleration_limits: true
+        max_acceleration       : 2.0     
+        min_acceleration       : -2.0
+      y:
+        has_velocity_limits    : true
+        max_velocity           : 2.0     
+        min_velocity           : -2.0
+        has_acceleration_limits: true
+        max_acceleration       : 2.0     
+        min_acceleration       : -2.0
+    angular:
+      z:
+        has_velocity_limits    : true
+        max_velocity           : 3.5     
+        min_velocity           : -3.5
+        has_acceleration_limits: true
+        max_acceleration       : 3.5
+        min_acceleration       : -3.5
     
     # 4. Limits and Timeouts
     reference_timeout: 2.0
